@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Container do Laravel (PHP)
+  finance_app:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: finance_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./php:/var/www/html
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+    depends_on:
+      - mysql_db
+
+  # Container do Banco de Dados (MySQL)
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: gastos
+      MYSQL_USER: pimenta
+      MYSQL_PASSWORD: "Pimenta@895531"
+      MYSQL_ROOT_PASSWORD: "Pimenta@895531"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    ports:
+      - "3307:3306"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
